@@ -1,0 +1,80 @@
+<title>Frame Extractor</title>
+<style>
+  body { background:#111; color:#eee; font:14px/1.5 ui-monospace,Menlo,monospace; padding:20px; }
+  #log { white-space:pre-wrap; }
+  canvas, video { max-width:420px; display:block; margin-top:12px; border:1px solid #333; }
+</style>
+<div id="log">idle</div>
+<video id="v" src="/assets/film.mp4" preload="auto" muted playsinline></video>
+<canvas id="c"></canvas>
+<script>
+const v = document.getElementById("v");
+const c = document.getElementById("c");
+const ctx = c.getContext("2d", { alpha: false });
+const log = (m) => { document.getElementById("log").textContent = m; };
+
+window.probe = () => ({
+  dur: v.duration, w: v.videoWidth, h: v.videoHeight, ready: v.readyState
+});
+
+function seek(t) {
+  return new Promise((resolve) => {
+    const done = () => { v.removeEventListener("seeked", done); resolve(); };
+    v.addEventListener("seeked", done);
+    v.currentTime = t;
+  });
+}
+
+function blobOf(quality, type) {
+  return new Promise((resolve) => c.toBlob(resolve, type, quality));
+}
+
+// Extract frames [from, to) of a total COUNT sampled evenly across the video.
+window.extract = async function (from, to, opts) {
+  opts = opts || {};
+  const COUNT = opts.count || 300;
+  const WIDTH = opts.width || 1400;
+  const TYPE = opts.type || "image/webp";
+  const Q = opts.quality || 0.82;
+  const EXT = TYPE === "image/webp" ? "webp" : "jpg";
+
+  const dur = v.duration;
+  // trim a hair off the tail — last frame often fails to decode
+  const span = dur - 0.06;
+  const scale = WIDTH / v.videoWidth;
+  c.width = WIDTH;
+  c.height = Math.round(v.videoHeight * scale);
+
+  let bytes = 0;
+  for (let i = from; i < to && i < COUNT; i++) {
+    const t = (i / (COUNT - 1)) * span;
+    await seek(t);
+    ctx.drawImage(v, 0, 0, c.width, c.height);
+    const blob = await blobOf(Q, TYPE);
+    bytes += blob.size;
+    const name = `frame_${String(i + 1).padStart(4, "0")}.${EXT}`;
+    await fetch(`/_write?name=${name}`, { method: "POST", body: blob });
+    if (i % 10 === 0) log(`frame ${i + 1}/${COUNT}  ${(bytes / 1048576).toFixed(2)} MB`);
+  }
+  log(`done ${from}..${to}  ${(bytes / 1048576).toFixed(2)} MB`);
+  return { from, to, count: COUNT, w: c.width, h: c.height, mb: +(bytes / 1048576).toFixed(2) };
+};
+
+window.writeManifest = async function (count, ext) {
+  const m = {
+    count,
+    pattern: `frames/frame_%04d.${ext || "webp"}`,
+    w: c.width, h: c.height,
+    duration: v.duration,
+  };
+  await fetch(`/_write?name=frames.json`, {
+    method: "POST",
+    body: new Blob([JSON.stringify(m, null, 2)], { type: "application/json" }),
+  });
+  return m;
+};
+
+v.addEventListener("loadedmetadata", () => {
+  log(`ready — ${v.videoWidth}x${v.videoHeight}  ${v.duration.toFixed(2)}s`);
+});
+</script>

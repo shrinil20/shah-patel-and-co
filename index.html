@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shah Patel &amp; Co. — Tyres &amp; Batteries, Naranpura</title>
+<meta name="description" content="Shah Patel & Co., Naranpura, Ahmedabad — tyre replacement, road-force wheel balancing and battery service. Rated 4.8 from 347 Google reviews. Opposite Jaymangal bus stop. Call 090333 08489.">
+<meta name="theme-color" content="#06080b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Noto+Sans+Gujarati:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06080b;
+    --bg-2: #0c1015;
+    --bg-3: #131922;
+    --accent: #5aa9ff;          /* blueprint blue */
+    --accent-2: #a9d3ff;
+    --text: #f2f5f8;
+    --text-dim: rgba(242, 245, 248, 0.62);
+    --line: rgba(242, 245, 248, 0.11);
+    --grid: rgba(90, 169, 255, 0.07);
+    --cta: #1f6fe5;
+    --cta-hover: #2b7ef5;
+    --on-cta: #ffffff;
+    --wa: #25d366;
+    --caption-text: #ffffff;
+    --caption-dim: rgba(255, 255, 255, 0.88);
+    --caption-accent: #8cc4ff;
+    --display: "Inter Tight", "Inter", -apple-system, sans-serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --gu: "Noto Sans Gujarati", var(--sans);
+    color-scheme: dark;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--cta); color: #fff; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ── loader ── */
+  #loader {
+    position: fixed; inset: 0; z-index: 100; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+    transition: opacity 0.8s ease;
+  }
+  #loader.done { opacity: 0; pointer-events: none; }
+  #loader .mark { display: flex; align-items: center; gap: 12px; font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: -0.03em; }
+  #loader .bar { width: 180px; height: 2px; border-radius: 2px; background: rgba(90, 169, 255, 0.18); overflow: hidden; position: relative; }
+  #loader .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: var(--accent); display: block; transition: width 0.2s ease; }
+  #loader .spec { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--text-dim); }
+
+  /* tyre-ring brand mark */
+  .ring { width: 24px; height: 24px; border-radius: 50%; flex: none; position: relative;
+    background: repeating-conic-gradient(from 0deg, #2a3038 0 8deg, #1a1f26 8deg 16deg);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+  .ring::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 1.5px var(--accent); }
+
+  /* ── scroll stage ── */
+  #track { height: 540vh; position: relative; }
+  @media (max-width: 620px) { #track { height: 420vh; } }
+  #stage { position: sticky; top: 0; height: 100vh; height: 100dvh; width: 100%; overflow: hidden; }
+  #film { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  /* extra dim over the busy blueprint half of the film; fades out by ~45% scroll (main.js) */
+  #filmdim { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: rgba(3, 7, 14, 0.34); }
+  #vignette {
+    position: absolute; inset: 0; z-index: 5; pointer-events: none;
+    background:
+      radial-gradient(ellipse 74% 80% at 50% 48%, transparent 56%, rgba(6, 8, 11, 0.9) 98%),
+      linear-gradient(to right, rgba(6, 8, 11, 0.8), transparent 15%, transparent 85%, rgba(6, 8, 11, 0.8)),
+      linear-gradient(to bottom, rgba(6, 8, 11, 0.55), transparent 20%, transparent 76%, rgba(6, 8, 11, 0.85));
+  }
+
+  #filmbar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 12;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 20px 5vw; pointer-events: none;
+  }
+  .logo { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -0.025em; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 10px; color: var(--text); }
+  .logo span { color: var(--accent); }
+  .wm { font-weight: inherit; }
+  #filmbar .logo { pointer-events: auto; text-shadow: 0 1px 14px rgba(0,0,0,.6); }
+  #filmbar .right { display: flex; align-items: center; gap: 14px; pointer-events: auto; }
+  #filmbar .place { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--caption-dim); text-shadow: 0 1px 12px rgba(0,0,0,.7); white-space: nowrap; }
+  @media (max-width: 560px) { #filmbar .place { display: none; } }
+  #progress { position: absolute; left: 0; bottom: 0; height: 2px; z-index: 12; width: 0; background: linear-gradient(90deg, var(--cta), var(--accent), var(--accent-2)); }
+
+  /* ── captions ── */
+  .caption { position: absolute; z-index: 10; opacity: 0; pointer-events: none; will-change: opacity, transform; }
+  .caption::before {
+    content: ""; position: absolute; inset: -38% -26%; z-index: -1;
+    background: radial-gradient(closest-side, rgba(4, 8, 14, 0.72), rgba(4, 8, 14, 0.34) 60%, transparent);
+    filter: blur(6px);
+  }
+  .caption .eyebrow { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--caption-accent); margin-bottom: 16px; text-shadow: 0 1px 10px rgba(0,0,0,.8); }
+  .caption h1, .caption h2 { font-family: var(--display); font-weight: 700; letter-spacing: -0.04em; color: var(--caption-text); text-shadow: 0 2px 28px rgba(0, 0, 0, 0.6); }
+  .caption h1 { font-size: clamp(48px, 8.4vw, 132px); line-height: 0.92; }
+  .caption h2 { font-size: clamp(38px, 5.4vw, 84px); line-height: 0.96; }
+  .caption h1 span, .caption h2 span { color: var(--caption-accent); }
+  .caption p { margin-top: 18px; font-size: clamp(15px, 1.3vw, 19px); line-height: 1.55; color: var(--caption-dim); max-width: 36ch; text-shadow: 0 1px 16px rgba(0, 0, 0, 0.7); }
+  .caption p.eyebrow { margin-top: 0; max-width: none; font-size: 11px; }
+  .caption .gu { font-family: var(--gu); font-weight: 500; letter-spacing: 0; text-transform: none; }
+
+  .cap-center { left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; width: max-content; max-width: 92vw; }
+  .cap-center p { margin-left: auto; margin-right: auto; }
+  .cap-left { left: 7vw; top: 50%; transform: translateY(-50%); max-width: 44vw; }
+  .cap-right { right: 7vw; top: 50%; transform: translateY(-50%); text-align: right; max-width: 44vw; }
+  .cap-right p { margin-left: auto; }
+  .cap-right .btns { justify-content: flex-end; }
+  @media (max-width: 700px), (max-width: 1100px) and (orientation: portrait) {
+    .cap-left, .cap-right { left: 6vw; right: 6vw; max-width: none; top: auto; bottom: 12vh; text-align: left; }
+    .cap-right p { margin-left: 0; }
+    .cap-right .btns { justify-content: flex-start; }
+    .cap-center { top: 40%; }
+  }
+
+  /* short landscape phones: keep captions clear of the top bar */
+  @media (max-height: 520px) {
+    .caption h1 { font-size: clamp(34px, 9vh, 60px); }
+    .caption h2 { font-size: clamp(28px, 8vh, 48px); }
+    .caption p { margin-top: 10px; font-size: 14px; }
+    .caption .eyebrow { margin-bottom: 8px; }
+    .caption .btns { margin-top: 14px; }
+    .cap-left, .cap-right { bottom: 8vh; }
+    #filmbar { padding: 12px 5vw; }
+  }
+
+  #scroll-cue {
+    position: absolute; bottom: 4.5vh; left: 50%; transform: translateX(-50%);
+    z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    color: var(--caption-dim); font-family: var(--mono); font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em; text-transform: uppercase; white-space: nowrap;
+    text-shadow: 0 1px 12px rgba(0,0,0,.7); transition: opacity 0.5s ease;
+  }
+  #scroll-cue::after { content: ""; width: 1px; height: 34px; background: linear-gradient(to bottom, var(--accent), transparent); animation: cue 1.8s ease-in-out infinite; }
+  @keyframes cue { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(8px); opacity: 0.4; } }
+
+  /* ── buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    padding: 14px 26px; border-radius: 999px; border: 0; cursor: pointer;
+    font-family: var(--sans); font-size: 15px; font-weight: 600; letter-spacing: -0.005em;
+    text-decoration: none; white-space: nowrap;
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+  .btn svg { width: 17px; height: 17px; flex: none; }
+  .btn-cta { background: var(--cta); color: var(--on-cta); }
+  .btn-cta:hover { background: var(--cta-hover); transform: translateY(-1px); }
+  .btn-wa { background: var(--wa); color: #05240f; }
+  .btn-wa:hover { transform: translateY(-1px); }
+  .btn-ghost { border: 1px solid rgba(242, 245, 248, 0.3); color: var(--text); background: rgba(6, 8, 11, 0.3); backdrop-filter: blur(8px); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 9px 16px; font-size: 13px; }
+  .caption .btns { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 12px; pointer-events: auto; }
+  .textlink { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .textlink:hover { text-decoration: underline; }
+
+  /* ═══ brand page (below the film) ═══ */
+  #brandnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 10px 4vw;
+    background: rgba(6, 8, 11, 0.78); backdrop-filter: saturate(160%) blur(18px);
+    opacity: 0; pointer-events: none; transform: translateY(-8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    border-bottom: 1px solid var(--line);
+  }
+  #brandnav.on { opacity: 1; pointer-events: auto; transform: none; }
+  #brandnav .logo { font-size: 18px; }
+  #brandnav .links { display: flex; gap: 2.6vw; }
+  #brandnav a.navlink { color: var(--text-dim); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.25s; }
+  #brandnav a.navlink:hover { color: var(--text); }
+  @media (max-width: 820px) { #brandnav .links { display: none; } }
+  @media (max-width: 400px) { #brandnav .logo { font-size: 16px; gap: 8px; } #brandnav .logo .ring { width: 20px; height: 20px; } #brandnav .logo .ring::after { inset: 5px; } }
+
+  /* mobile sticky action bar */
+  #mbar {
+    position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 85;
+    display: none; gap: 8px; padding: 8px; border-radius: 22px;
+    background: rgba(12, 16, 21, 0.9); backdrop-filter: blur(16px);
+    border: 1px solid var(--line);
+    transform: translateY(140%); transition: transform 0.4s ease;
+  }
+  #mbar.on { transform: none; }
+  #mbar .btn { flex: 1; padding: 13px 6px; font-size: 13px; min-width: 0; }
+  @media (max-width: 700px) { #mbar { display: flex; } footer.bp-footer { padding-bottom: 110px !important; } }
+
+  .bp { position: relative; padding: 14vh 7vw; max-width: 1480px; margin: 0 auto; }
+  .kicker { display: inline-block; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .bp h2 { font-family: var(--display); font-weight: 700; letter-spacing: -0.04em; line-height: 1; font-size: clamp(40px, 5.6vw, 84px); }
+  .bp h2 span { color: var(--accent); }
+  .bp h2 .mute { color: var(--text-dim); }
+  .bp p.lead { color: var(--text-dim); font-size: clamp(16px, 1.3vw, 19px); line-height: 1.7; max-width: 52ch; margin-top: 22px; }
+  .bp p.lead b { color: var(--text); font-weight: 600; }
+  [data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity 1s cubic-bezier(.2,.6,.2,1), transform 1s cubic-bezier(.2,.6,.2,1); }
+  [data-reveal].in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; transition: none; } }
+
+  .blueprint-bg {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(rgba(90,169,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(90,169,255,.035) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  }
+
+  /* trust strip */
+  .trust { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg-2); }
+  .trust .inner { max-width: 1480px; margin: 0 auto; padding: 22px 7vw; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .trust .item { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+  .trust .item svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+  .trust .item b { font-family: var(--display); font-weight: 700; }
+  @media (max-width: 900px) { .trust .inner { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 440px) { .trust .inner { grid-template-columns: 1fr; } }
+
+  /* manifesto */
+  .bp-manifesto { text-align: center; padding: 22vh 7vw 16vh; }
+  .bp-manifesto h2 { font-size: clamp(44px, 7vw, 116px) !important; max-width: 15ch; margin: 0 auto; }
+  .bp-manifesto p.lead { margin: 28px auto 0; }
+  .bp-manifesto .dims { margin-top: 42px; display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+  .bp-manifesto .dims i { font-style: normal; color: var(--accent); }
+
+  /* services */
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px; }
+  .card { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 26px; padding: 30px 26px 32px; background: var(--bg-2); transition: transform .35s ease, border-color .35s ease; display: flex; flex-direction: column; }
+  .card:hover { transform: translateY(-4px); border-color: rgba(90, 169, 255, 0.45); }
+  .card .top { display: flex; justify-content: space-between; align-items: center; }
+  .card .num { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 0.1em; }
+  .card .ic { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: rgba(90, 169, 255, 0.1); color: var(--accent); }
+  .card .ic svg { width: 22px; height: 22px; }
+  .card h3 { font-family: var(--display); font-weight: 700; font-size: 25px; letter-spacing: -0.03em; margin-top: 44px; line-height: 1.08; }
+  .card p { margin-top: 12px; font-size: 14px; line-height: 1.65; color: var(--text-dim); }
+  .card .tag { margin-top: auto; padding-top: 22px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: color-mix(in srgb, var(--text) 45%, transparent); }
+  .card.hl { background: radial-gradient(120% 90% at 100% 0%, rgba(31, 111, 229, 0.28), transparent 60%), var(--bg-2); border-color: rgba(90, 169, 255, 0.4); }
+  @media (max-width: 1080px) { .cards { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+
+  /* sidewall decoder */
+  .decoder { display: grid; grid-template-columns: 1fr 1.05fr; gap: 5vw; align-items: center; }
+  .sidewall {
+    margin-top: 40px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 2px;
+    font-family: var(--display); font-weight: 800; letter-spacing: -0.03em; font-size: clamp(34px, 4.1vw, 64px); line-height: 1;
+  }
+  .sidewall button {
+    font: inherit; letter-spacing: inherit; color: color-mix(in srgb, var(--text) 38%, transparent);
+    background: none; border: 0; cursor: pointer; padding: 6px 8px; border-radius: 14px;
+    transition: color .25s ease, background-color .25s ease;
+  }
+  .sidewall button:hover { color: var(--text); }
+  .sidewall button[aria-pressed="true"] { color: var(--accent); background: rgba(90, 169, 255, 0.1); }
+  .sidewall .sep { color: color-mix(in srgb, var(--text) 22%, transparent); padding: 0 2px; }
+  .decode-panel { margin-top: 26px; border: 1px solid var(--line); border-radius: 22px; padding: 24px 26px; background: var(--bg-2); min-height: 150px; }
+  .decode-panel .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .decode-panel h3 { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: -0.03em; margin-top: 10px; }
+  .decode-panel p { margin-top: 8px; color: var(--text-dim); font-size: 15px; line-height: 1.65; }
+  .decode-hint { margin-top: 16px; font-size: 13px; color: var(--text-dim); }
+  .bpimg { position: relative; border-radius: 26px; overflow: hidden; border: 1px solid rgba(90, 169, 255, 0.22); box-shadow: 0 50px 100px -60px rgba(31, 111, 229, 0.6); }
+  .bpimg img { width: 100%; height: auto; display: block; aspect-ratio: 3 / 2; object-fit: cover; }
+  .bpimg figcaption { position: absolute; left: 14px; bottom: 14px; padding: 8px 12px; border-radius: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: #dbe9ff; background: rgba(6, 12, 24, 0.7); backdrop-filter: blur(8px); }
+  @media (max-width: 900px) { .decoder { grid-template-columns: 1fr; } }
+
+  /* facts */
+  .facts { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 26px; overflow: hidden; background: var(--bg-2); }
+  .fact { padding: 38px 28px; border-right: 1px solid var(--line); }
+  .fact:last-child { border-right: 0; }
+  .fact .big { font-family: var(--display); font-weight: 700; font-size: clamp(46px, 5.2vw, 80px); letter-spacing: -0.05em; line-height: 1; }
+  .fact .big small { font-size: 0.45em; color: var(--accent); letter-spacing: -0.02em; margin-left: 4px; }
+  .fact .lbl { margin-top: 14px; font-size: 14px; line-height: 1.5; color: var(--text-dim); }
+  @media (max-width: 900px) { .facts { grid-template-columns: 1fr 1fr; } .fact:nth-child(2) { border-right: 0; } .fact:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
+  @media (max-width: 440px) { .facts { grid-template-columns: 1fr; } .fact { border-right: 0; border-bottom: 1px solid var(--line); } .fact:last-child { border-bottom: 0; } }
+
+  /* split: signs it's time */
+  .bp-split { display: grid; grid-template-columns: 1.05fr 1fr; gap: 6vw; align-items: center; }
+  .bp-split .imgwrap { position: relative; aspect-ratio: 4 / 3; border-radius: 26px; overflow: hidden; background: #0b0d11; }
+  .bp-split .imgwrap img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.06); transition: transform 1.8s cubic-bezier(.2,.6,.2,1); }
+  .bp-split .imgwrap:hover img { transform: scale(1.1); }
+  .bp-split .imgwrap .chip { position: absolute; left: 16px; bottom: 16px; z-index: 2; padding: 9px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: #fff; background: rgba(6, 8, 11, 0.6); backdrop-filter: blur(10px); }
+  .signs { list-style: none; margin-top: 30px; display: grid; gap: 4px; }
+  .signs li { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .signs li:last-child { border-bottom: 0; }
+  .signs .n { font-family: var(--mono); font-size: 12px; color: var(--accent); padding-top: 4px; }
+  .signs b { display: block; font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -0.02em; }
+  .signs span { display: block; margin-top: 4px; color: var(--text-dim); font-size: 14px; line-height: 1.6; }
+  @media (max-width: 860px) { .bp-split { grid-template-columns: 1fr; } }
+
+  /* reviews */
+  .reviews-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
+  .score { display: flex; align-items: center; gap: 18px; }
+  .score .big { font-family: var(--display); font-weight: 700; font-size: 72px; letter-spacing: -0.05em; line-height: 1; }
+  .stars { display: flex; gap: 3px; color: #ffc53d; }
+  .stars svg { width: 18px; height: 18px; }
+  .score small { display: block; margin-top: 6px; color: var(--text-dim); font-size: 13px; }
+  .rv-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-top: 50px; }
+  .rv { border: 1px solid var(--line); border-radius: 26px; padding: 34px 32px; background: var(--bg-2); display: flex; flex-direction: column; }
+  .rv blockquote { font-family: var(--display); font-weight: 600; letter-spacing: -0.025em; font-size: 22px; line-height: 1.35; }
+  .rv.big blockquote { font-size: clamp(26px, 2.6vw, 38px); line-height: 1.2; }
+  .rv .who { margin-top: auto; padding-top: 28px; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+  .rv .av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; font-family: var(--display); font-weight: 700; color: #fff; background: linear-gradient(135deg, #2b7ef5, #0f3f8f); }
+  .rv .who small { display: block; color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+  .rv-stack { display: grid; gap: 16px; }
+  .themes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .themes span { border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font-size: 13px; color: var(--text-dim); }
+  .themes span b { color: var(--accent); font-family: var(--mono); font-weight: 500; margin-left: 6px; }
+  @media (max-width: 900px) { .rv-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { .rv { padding: 26px 22px; } }
+
+  /* enquiry builder */
+  .quote { display: grid; grid-template-columns: 1fr 1.1fr; gap: 5vw; align-items: start; }
+  .quote-card { border: 1px solid var(--line); border-radius: 28px; padding: 34px 32px; background: var(--bg-2); box-shadow: 0 50px 90px -60px rgba(0,0,0,.8); }
+  .field { margin-bottom: 22px; border: 0; }
+  .field > label, .field > legend, .field > .lab { display: block; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; padding: 0; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 5px; border-radius: 16px; background: var(--bg-3); }
+  .seg button { border: 0; cursor: pointer; padding: 12px 6px; border-radius: 12px; font: 600 14px var(--sans); color: var(--text-dim); background: transparent; transition: all .25s ease; }
+  .seg button[aria-pressed="true"] { background: var(--bg); color: var(--text); box-shadow: 0 4px 14px -6px rgba(0,0,0,.6); }
+  .input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: 500 15px var(--sans); outline: none; transition: border-color .25s ease; }
+  .input:focus { border-color: var(--accent); }
+  .input::placeholder { color: color-mix(in srgb, var(--text) 38%, transparent); }
+  .input.mono { font-family: var(--mono); letter-spacing: 0.04em; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips button { border: 1px solid var(--line); background: transparent; color: var(--text-dim); border-radius: 999px; padding: 9px 16px; font: 500 14px var(--sans); cursor: pointer; transition: all .2s ease; }
+  .chips button:hover { border-color: var(--accent); color: var(--text); }
+  .chips button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: rgba(90, 169, 255, 0.08); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 460px) { .row2 { grid-template-columns: 1fr; } }
+  .quote-card .btn { width: 100%; margin-top: 6px; }
+  .quote-card .alt { margin-top: 14px; text-align: center; font-size: 13px; color: var(--text-dim); }
+  .quote-card .alt a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .quote .checks { list-style: none; margin-top: 28px; display: grid; gap: 12px; }
+  .quote .checks li { display: flex; gap: 12px; font-size: 15px; line-height: 1.5; color: var(--text-dim); }
+  .quote .checks li svg { width: 20px; height: 20px; flex: none; color: var(--accent); margin-top: 1px; }
+  @media (max-width: 900px) { .quote { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { .quote-card { padding: 26px 20px; } .seg button { font-size: 13px; } }
+
+  /* visit */
+  .visit { display: grid; grid-template-columns: 1fr 1fr; gap: 5vw; align-items: center; }
+  .mapcard { position: relative; aspect-ratio: 5 / 4; border-radius: 28px; overflow: hidden; border: 1px solid rgba(90, 169, 255, 0.22); background: #081322; }
+  .mapcard svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .mapcard .pinlbl { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -150%); white-space: nowrap; padding: 9px 14px; border-radius: 12px; background: var(--cta); color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 12px 30px -10px rgba(31,111,229,.8); }
+  .mapcard .pinlbl::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 12px; height: 12px; background: var(--cta); transform: translateX(-50%) rotate(45deg); }
+  .mapcard .code { position: absolute; right: 16px; bottom: 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: #9cc6ff; }
+  .contact-card { border: 1px solid var(--line); border-radius: 28px; padding: 32px; background: var(--bg-2); margin-top: 34px; }
+  .crow { display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .crow:last-of-type { border-bottom: 0; }
+  .crow .k { color: var(--text-dim); font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; padding-top: 3px; }
+  .crow .v { text-align: right; line-height: 1.55; }
+  .crow .v a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  .crow .v small { display: block; color: var(--text-dim); font-size: 13px; }
+  .contact-card .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+  @media (max-width: 860px) { .visit { grid-template-columns: 1fr; } }
+  @media (max-width: 460px) { .crow { flex-direction: column; gap: 4px; } .crow .v { text-align: left; } .contact-card { padding: 24px 20px; } .contact-card .btns { grid-template-columns: 1fr; } }
+
+  /* closing band */
+  .bp-ctaband { text-align: center; padding: 24vh 7vw; position: relative; overflow: hidden; max-width: none; }
+  .bp-ctaband .bgimg { position: absolute; inset: 0; background: url("assets/still_tyre.webp") center / cover no-repeat; opacity: 0.55; }
+  .bp-ctaband .bgimg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(6,8,11,.35), var(--bg) 76%); }
+  .bp-ctaband > div:last-child { position: relative; }
+  .bp-ctaband h2 { font-size: clamp(48px, 7.4vw, 124px) !important; max-width: 13ch; margin: 0 auto; }
+  .bp-ctaband .gu { font-family: var(--gu); font-weight: 500; font-size: 18px; color: var(--text-dim); margin-top: 22px; }
+  .bp-ctaband .contactrow { margin-top: 34px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+  footer.bp-footer { border-top: 1px solid var(--line); padding: 9vh 7vw 6vh; }
+  .bp-footer .cols { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 5vw; max-width: 1480px; margin: 0 auto; }
+  .bp-footer .logo { font-size: 24px; }
+  .bp-footer .gu { font-family: var(--gu); font-size: 15px; color: var(--text-dim); margin-top: 10px; }
+  .bp-footer .about { margin-top: 14px; font-size: 14px; line-height: 1.7; color: var(--text-dim); max-width: 36ch; }
+  .bp-footer h4 { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; }
+  .bp-footer a:not(.logo), .bp-footer .line { display: block; color: var(--text-dim); text-decoration: none; font-size: 14px; margin-bottom: 10px; line-height: 1.5; }
+  .bp-footer a:not(.logo):hover { color: var(--text); }
+  .bp-footer .fine { margin-top: 8vh; text-align: center; font-size: 12px; color: color-mix(in srgb, var(--text) 42%, transparent); }
+  @media (max-width: 800px) { .bp-footer .cols { grid-template-columns: 1fr 1fr; } .bp-footer .cols > :first-child { grid-column: 1 / -1; } }
+  @media (max-width: 400px) { .bp-footer .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body id="top">
+
+<div id="loader">
+  <div class="mark"><i class="ring"></i><b class="wm">Shah Patel <span style="color:var(--accent)">&amp; Co.</span></b></div>
+  <div class="bar"><i id="loadbar"></i></div>
+  <div class="spec">205 / 60 R16 · LOADING</div>
+</div>
+
+<div id="track">
+  <div id="stage">
+    <canvas id="film"></canvas>
+    <div id="filmdim"></div>
+    <div id="vignette"></div>
+
+    <div id="filmbar">
+      <a class="logo" href="#top"><i class="ring"></i><b class="wm">Shah Patel <span>&amp; Co.</span></b></a>
+      <div class="right">
+        <span class="place">Naranpura · Ahmedabad</span>
+        <a class="btn btn-ghost btn-sm" href="tel:+919033308489">Call</a>
+      </div>
+    </div>
+
+    <!-- 0–15%: flat blueprint, camera pushes in -->
+    <div class="caption cap-center" data-in="-0.05" data-hold="0.03" data-out="0.13">
+      <p class="eyebrow">Shah Patel &amp; Co. · <span class="gu">શાહ પટેલ &amp; કો.</span></p>
+      <h1>Engineered grip.<br><span>Fitted right.</span></h1>
+      <p>Tyres, wheel balancing and batteries — Naranpura, Ahmedabad.</p>
+    </div>
+
+    <!-- 15–27%: drawings lift into 3D wireframe -->
+    <div class="caption cap-left" data-in="0.15" data-hold="0.20" data-out="0.27">
+      <p class="eyebrow">01 — It starts on paper</p>
+      <h2>Size first.<br><span>Tyre second.</span></h2>
+      <p>Width, profile, rim, load and speed rating — we match all five to your car before a tyre comes off the rack.</p>
+    </div>
+
+    <!-- 28–44%: wireframe wraps into rubber -->
+    <div class="caption cap-right" data-in="0.29" data-hold="0.35" data-out="0.44">
+      <p class="eyebrow">02 — From line to rubber</p>
+      <h2>Steel-belted.<br><span>Road-ready.</span></h2>
+      <p>New tyres for cars and SUVs, fitted in Naranpura at prices our customers call very reasonable.</p>
+    </div>
+
+    <!-- 48–62%: studio, tread-on view -->
+    <div class="caption cap-left" data-in="0.47" data-hold="0.53" data-out="0.62">
+      <p class="eyebrow">03 — Road-force balancing</p>
+      <h2>Balanced<br><span>to the gram.</span></h2>
+      <p>Road-force wheel balancing presses a roller against the tyre to find the vibration a spin balancer can miss.</p>
+    </div>
+
+    <!-- 65–82%: hero three-quarter turn -->
+    <div class="caption cap-right" data-in="0.65" data-hold="0.72" data-out="0.82">
+      <p class="eyebrow">04 — Batteries too</p>
+      <h2>Starts<br><span>every morning.</span></h2>
+      <p>Battery checks, repair and replacement, under the same roof as your tyres.</p>
+    </div>
+
+    <!-- 85–100%: hold on hero -->
+    <div class="caption cap-left" data-in="0.85" data-hold="0.94" data-out="1.12">
+      <p class="eyebrow">★ 4.8 · 347 Google reviews</p>
+      <h2>Naranpura's<br><span>tyre people.</span></h2>
+      <p>Opposite Jaymangal bus stop. Walk in, pick up, or have it delivered.</p>
+      <div class="btns">
+        <a class="btn btn-cta" href="tel:+919033308489"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>Call 090333 08489</a>
+        <a class="btn btn-ghost" href="#visit">Get directions</a>
+      </div>
+    </div>
+
+    <div id="scroll-cue">Scroll</div>
+    <div id="progress"></div>
+  </div>
+</div>
+
+<!-- ═══════════ brand page ═══════════ -->
+
+<nav id="brandnav" aria-label="Main">
+  <a class="logo" href="#top"><i class="ring"></i><b class="wm">Shah Patel <span>&amp; Co.</span></b></a>
+  <div class="links">
+    <a class="navlink" href="#services">Services</a>
+    <a class="navlink" href="#sidewall">Your size</a>
+    <a class="navlink" href="#reviews">Reviews</a>
+    <a class="navlink" href="#visit">Visit</a>
+  </div>
+  <a class="btn btn-cta btn-sm" href="tel:+919033308489">Call now</a>
+</nav>
+
+<div id="mbar">
+  <a class="btn btn-cta" href="tel:+919033308489">Call</a>
+  <a class="btn btn-wa wa-link" href="https://wa.me/919033308489" target="_blank" rel="noopener">WhatsApp</a>
+  <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Shah+Patel+%26+Co.+Naranpura+Ahmedabad" target="_blank" rel="noopener">Directions</a>
+</div>
+
+<main>
+  <div class="trust">
+    <div class="inner">
+      <div class="item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><span><b>4.8</b> on Google · 347 reviews</span></div>
+      <div class="item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 4.5 4h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg><span>In-store shopping</span></div>
+      <div class="item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg><span>In-store pick-up</span></div>
+      <div class="item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h13v12H1zM14 9h4l3 3v4h-7"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="17.5" cy="18.5" r="2"/></svg><span>Delivery available</span></div>
+    </div>
+  </div>
+
+  <section class="bp bp-manifesto" data-reveal>
+    <p class="kicker">Why it matters</p>
+    <h2>The only part of your car that <span>touches the road.</span></h2>
+    <p class="lead">Four patches of rubber, each about the size of your palm, carry your braking, your steering and everyone in the car. We fit them like that matters — because it does.</p>
+    <div class="dims"><span>Width <i>205 mm</i></span><span>Profile <i>60%</i></span><span>Rim <i>16″</i></span><span>Construction <i>Radial</i></span></div>
+  </section>
+
+  <section class="bp" id="services">
+    <div data-reveal>
+      <p class="kicker">What we do</p>
+      <h2>Tyres, wheels, batteries.<br><span class="mute">One stop in Naranpura.</span></h2>
+    </div>
+    <div class="cards">
+      <article class="card hl" data-reveal>
+        <div class="top"><span class="num">01</span><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg></span></div>
+        <h3>Tyre replacement</h3>
+        <p>The right size and rating for your car, fitted, inflated and checked before you drive away.</p>
+        <span class="tag">Most-mentioned in reviews</span>
+      </article>
+      <article class="card" data-reveal>
+        <div class="top"><span class="num">02</span><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12h4l2-5 3 10 3-8 2 3h4"/></svg></span></div>
+        <h3>Road-force wheel balancing</h3>
+        <p>Measures the tyre under load, not just spinning free, to cure steering shake at highway speed.</p>
+        <span class="tag">Balancing under load</span>
+      </article>
+      <article class="card" data-reveal>
+        <div class="top"><span class="num">03</span><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M6 7V4h3v3M15 7V4h3v3M6 13.5h4M16 11.5v4M14 13.5h4"/></svg></span></div>
+        <h3>Battery service &amp; repair</h3>
+        <p>Testing, repair and replacement when your car is slow to start or the warning light comes on.</p>
+        <span class="tag">Test · repair · replace</span>
+      </article>
+      <article class="card" data-reveal>
+        <div class="top"><span class="num">04</span><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h13v12H1zM14 9h4l3 3v4h-7"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="17.5" cy="18.5" r="2"/></svg></span></div>
+        <h3>Shop, pick up or delivered</h3>
+        <p>Choose in store, reserve and pick up, or have your tyres and batteries delivered.</p>
+        <span class="tag">3 ways to buy</span>
+      </article>
+    </div>
+  </section>
+
+  <div class="blueprint-bg">
+    <section class="bp" id="sidewall">
+      <div class="decoder">
+        <div data-reveal>
+          <p class="kicker">Read your sidewall</p>
+          <h2>Your tyre size is<br><span>already on your tyre.</span></h2>
+          <p class="lead">Every tyre carries a code on its sidewall. Tap each part to see what it means, then send us yours.</p>
+          <div class="sidewall" role="group" aria-label="Example tyre size 205/60 R16 91V">
+            <button type="button" data-k="w" aria-pressed="true">205</button><span class="sep">/</span><button type="button" data-k="a" aria-pressed="false">60</button><button type="button" data-k="r" aria-pressed="false">R</button><button type="button" data-k="d" aria-pressed="false">16</button><span class="sep">&nbsp;</span><button type="button" data-k="l" aria-pressed="false">91</button><button type="button" data-k="s" aria-pressed="false">V</button>
+          </div>
+          <div class="decode-panel" aria-live="polite">
+            <div class="lbl" id="dLbl">Section width</div>
+            <h3 id="dTitle">205 mm wide</h3>
+            <p id="dText">The width of the tyre from sidewall to sidewall, in millimetres.</p>
+          </div>
+          <p class="decode-hint">Don't want to read it yourself? <a class="textlink" href="#quote">Send us a photo or the numbers</a> and we'll tell you what fits.</p>
+        </div>
+        <figure class="bpimg" data-reveal>
+          <img src="assets/still_blueprint.webp" alt="Blueprint of a 205/60 R16 radial tyre: front, side, cross-section and 3D views with dimensions" loading="lazy" width="1536" height="1024">
+          <figcaption>205 / 60 R16 · RADIAL TUBELESS</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <section class="bp" style="padding-top: 6vh; padding-bottom: 6vh;">
+    <div class="facts" data-reveal>
+      <div class="fact"><div class="big">4.8<small>★</small></div><div class="lbl">Average Google rating</div></div>
+      <div class="fact"><div class="big">347</div><div class="lbl">Google reviews from drivers</div></div>
+      <div class="fact"><div class="big">3</div><div class="lbl">Ways to buy — in store, pick-up, delivery</div></div>
+      <div class="fact"><div class="big">10<small>AM</small></div><div class="lbl">Doors open · call to confirm today's hours</div></div>
+    </div>
+  </section>
+
+  <section class="bp">
+    <div class="bp-split">
+      <div data-reveal>
+        <p class="kicker">When to come in</p>
+        <h2>Four signs<br><span>it's time.</span></h2>
+        <ul class="signs">
+          <li><span class="n">01</span><div><b>Tread down to the wear bars</b><span>Small raised bars sit inside the grooves. Once the tread is level with them, wet grip drops sharply.</span></div></li>
+          <li><span class="n">02</span><div><b>Cracks or a bulge on the sidewall</b><span>A bulge means the inner structure is damaged. Don't wait for the next service.</span></div></li>
+          <li><span class="n">03</span><div><b>Steering shakes at speed</b><span>Usually a balance problem. Road-force balancing is built to find it.</span></div></li>
+          <li><span class="n">04</span><div><b>Slow cranking in the morning</b><span>A weak battery gives warnings before it fails. A quick test tells you where it stands.</span></div></li>
+        </ul>
+      </div>
+      <div class="imgwrap" data-reveal>
+        <img src="assets/still_tyre.webp" alt="A new radial car tyre standing on a dark studio floor" loading="lazy" width="1664" height="928">
+        <span class="chip">Checked before you drive away</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="bp" id="reviews">
+    <div class="reviews-head" data-reveal>
+      <div>
+        <p class="kicker">What drivers say</p>
+        <h2>Good tyres.<br><span>Good people.</span></h2>
+      </div>
+      <div class="score">
+        <div class="big">4.8</div>
+        <div>
+          <div class="stars" aria-label="4.8 out of 5 stars">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+          </div>
+          <small>347 Google reviews</small>
+        </div>
+      </div>
+    </div>
+    <div class="rv-grid">
+      <figure class="rv big" data-reveal>
+        <blockquote>“One of the best tyre vendors I’ve found in Ahmedabad. They offer very reasonable prices along with prompt and reliable service.”</blockquote>
+        <figcaption class="who"><span class="av">T</span><span>Tirthesh Travels<small>Google review</small></span></figcaption>
+      </figure>
+      <div class="rv-stack">
+        <figure class="rv" data-reveal>
+          <blockquote>“Excellent place for tyre and battery service — best in Naranpura area.”</blockquote>
+          <figcaption class="who"><span class="av">G</span><span>From Google's review highlights</span></figcaption>
+        </figure>
+        <figure class="rv" data-reveal>
+          <blockquote>“Very good work and very good staff behavior and services.”</blockquote>
+          <figcaption class="who"><span class="av">D</span><span>Dilipsinh Devada<small>Google review</small></span></figcaption>
+        </figure>
+      </div>
+    </div>
+    <div class="themes" data-reveal>
+      <span>Tyre replacement<b>11</b></span>
+      <span>Humble staff<b>6</b></span>
+      <span>Road-force wheel balancing<b>3</b></span>
+      <span>Battery repair<b>2</b></span>
+    </div>
+  </section>
+
+  <section class="bp" id="quote">
+    <div class="quote">
+      <div data-reveal>
+        <p class="kicker">Get a price</p>
+        <h2>Tell us your car.<br><span>We'll do the rest.</span></h2>
+        <p class="lead">Pick your vehicle, add the size from your sidewall if you have it, and send it on WhatsApp. We'll reply with options and prices.</p>
+        <ul class="checks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg><span>Don't know your size? Send a photo of the sidewall in the chat.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg><span>Ask for store pick-up or delivery.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg><span>Prefer to talk? Call <a class="textlink" href="tel:+919033308489">090333 08489</a>.</span></li>
+        </ul>
+      </div>
+      <form class="quote-card" id="quoteForm" data-reveal novalidate>
+        <div class="field">
+          <span class="lab">Vehicle</span>
+          <div class="seg" id="qVehicle">
+            <button type="button" data-v="Hatchback" aria-pressed="true">Hatchback</button>
+            <button type="button" data-v="Sedan" aria-pressed="false">Sedan</button>
+            <button type="button" data-v="SUV" aria-pressed="false">SUV</button>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="qCar">Make &amp; model</label>
+            <input class="input" id="qCar" type="text" placeholder="e.g. Maruti Swift" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="qSize">Tyre size (optional)</label>
+            <input class="input mono" id="qSize" type="text" placeholder="205/60 R16" autocomplete="off">
+          </div>
+        </div>
+        <div class="field">
+          <span class="lab">I need</span>
+          <div class="chips" id="qNeeds">
+            <button type="button" data-n="New tyres" aria-pressed="true">New tyres</button>
+            <button type="button" data-n="Wheel balancing" aria-pressed="false">Wheel balancing</button>
+            <button type="button" data-n="Battery" aria-pressed="false">Battery</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="lab">How many tyres</span>
+          <div class="chips" id="qQty">
+            <button type="button" data-q="1" aria-pressed="false">1</button>
+            <button type="button" data-q="2" aria-pressed="false">2</button>
+            <button type="button" data-q="4" aria-pressed="true">4</button>
+            <button type="button" data-q="5 (with spare)" aria-pressed="false">5 with spare</button>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <span class="lab">Collection</span>
+            <div class="chips" id="qMode">
+              <button type="button" data-m="Pick-up in store" aria-pressed="true">Pick-up</button>
+              <button type="button" data-m="Delivery" aria-pressed="false">Delivery</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="qName">Your name</label>
+            <input class="input" id="qName" type="text" placeholder="Name" autocomplete="name">
+          </div>
+        </div>
+        <button class="btn btn-wa" type="submit"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.3 0 .5l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1.9 2 1.2 2.3 1.4.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l2 .9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>Send on WhatsApp</button>
+        <p class="alt">or call <a href="tel:+919033308489">090333 08489</a></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="bp" id="visit">
+    <div class="visit">
+      <div data-reveal>
+        <p class="kicker">Visit us</p>
+        <h2>Opposite Jaymangal.<br><span>Right at the bus stop.</span></h2>
+        <div class="contact-card">
+          <div class="crow"><span class="k">Address</span><span class="v">293, Nirmal Apartments, near bus stop,<br>opp. Jaymangal, Naranpura,<br>Ahmedabad, Gujarat 380063</span></div>
+          <div class="crow"><span class="k">Phone</span><span class="v"><a href="tel:+919033308489">090333 08489</a></span></div>
+          <div class="crow"><span class="k">Hours</span><span class="v">Opens 10 AM<small>Call ahead to confirm today's hours</small></span></div>
+          <div class="crow"><span class="k">Plus code</span><span class="v">3G4X+XH Ahmedabad</span></div>
+          <div class="btns">
+            <a class="btn btn-cta" href="https://www.google.com/maps/search/?api=1&amp;query=Shah+Patel+%26+Co.+Naranpura+Ahmedabad" target="_blank" rel="noopener">Get directions</a>
+            <a class="btn btn-ghost" href="tel:+919033308489">Call the shop</a>
+          </div>
+        </div>
+      </div>
+      <div class="mapcard" data-reveal aria-hidden="true">
+        <svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(90,169,255,.08)"/></pattern>
+          </defs>
+          <rect width="500" height="400" fill="url(#g)"/>
+          <g fill="none" stroke="rgba(90,169,255,.35)" stroke-width="14" stroke-linecap="round">
+            <path d="M-20 212 C120 205 300 220 520 200"/>
+            <path d="M250 -20 C245 120 262 280 240 420"/>
+          </g>
+          <g fill="none" stroke="rgba(90,169,255,.18)" stroke-width="6" stroke-linecap="round">
+            <path d="M-20 90 C140 110 330 70 520 100"/>
+            <path d="M-20 330 C160 320 330 345 520 320"/>
+            <path d="M90 -20 C100 140 80 260 110 420"/>
+            <path d="M400 -20 C390 150 410 260 395 420"/>
+          </g>
+          <g font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(169,211,255,.6)" letter-spacing="1.5">
+            <text x="300" y="196">NARANPURA</text>
+            <text x="120" y="236">JAYMANGAL</text>
+          </g>
+          <circle cx="250" cy="206" r="34" fill="rgba(31,111,229,.18)"/>
+          <circle cx="250" cy="206" r="10" fill="#1f6fe5" stroke="#fff" stroke-width="3"/>
+        </svg>
+        <span class="pinlbl">Shah Patel &amp; Co.</span>
+        <span class="code">3G4X+XH · 380063</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="bp bp-ctaband">
+    <div class="bgimg"></div>
+    <div data-reveal>
+      <p class="kicker">Ready when you are</p>
+      <h2>Your next set is <span>waiting.</span></h2>
+      <p class="gu">શાહ પટેલ &amp; કો. · નારણપુરા, અમદાવાદ</p>
+      <div class="contactrow">
+        <a class="btn btn-cta" href="tel:+919033308489">Call 090333 08489</a>
+        <a class="btn btn-ghost" href="#quote">Get a price</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="bp-footer">
+  <div class="cols">
+    <div>
+      <a class="logo" href="#top"><i class="ring"></i><b class="wm">Shah Patel <span>&amp; Co.</span></b></a>
+      <p class="gu">શાહ પટેલ &amp; કો.</p>
+      <p class="about">Tyre shop in Naranpura, Ahmedabad. Tyre replacement, road-force wheel balancing and battery service.</p>
+    </div>
+    <div>
+      <h4>Services</h4>
+      <a href="#services">Tyre replacement</a>
+      <a href="#services">Wheel balancing</a>
+      <a href="#services">Battery service</a>
+      <a href="#sidewall">Find your size</a>
+    </div>
+    <div>
+      <h4>Visit</h4>
+      <span class="line">293, Nirmal Apartments</span>
+      <span class="line">Opp. Jaymangal, Naranpura</span>
+      <span class="line">Ahmedabad 380063</span>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <a href="tel:+919033308489">090333 08489</a>
+      <a class="wa-link" href="https://wa.me/919033308489" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=Shah+Patel+%26+Co.+Naranpura+Ahmedabad" target="_blank" rel="noopener">Google Maps</a>
+    </div>
+  </div>
+  <p class="fine">© 2026 Shah Patel &amp; Co., Naranpura, Ahmedabad. Ratings and review quotes from Google.</p>
+</footer>
+
+<script src="main.js"></script>
+<script src="brand.js"></script>
+</body>
+</html>

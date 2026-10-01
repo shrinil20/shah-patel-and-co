@@ -201,7 +201,10 @@ function updateCaptions(p) {
     el.style.transform = `${transformBase(el)} translateY(${drift.toFixed(1)}px)`;
   }
   scrollCue.style.opacity = p < 0.015 ? 1 : 0;
-  filmDim.style.opacity = Math.min(Math.max(1 - (p - 0.3) / 0.16, 0), 1).toFixed(3);
+  // clean blueprint at load; dim fades in with the opening title, out as the studio arrives
+  const dimIn = Math.min(Math.max((p - 0.015) / 0.045, 0), 1);
+  const dimOut = Math.min(Math.max(1 - (p - 0.3) / 0.16, 0), 1);
+  filmDim.style.opacity = Math.min(dimIn, dimOut).toFixed(3);
   progressBar.style.width = `${(p * 100).toFixed(2)}%`;
 }
 
